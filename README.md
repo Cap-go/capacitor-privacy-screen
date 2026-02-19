@@ -88,6 +88,29 @@ rm scripts/init-plugin.sh
 
 Then remove `"init-plugin"` from the `scripts` section in `package.json` before publishing.
 
+## Capacitor Hook Scripts (Recommended)
+
+For plugins that need automated setup during `cap sync` / `cap update`, define Capacitor lifecycle hooks in `package.json`.
+
+Example:
+
+```json
+{
+  "scripts": {
+    "generate:version-share": "bun run scripts/generate-version-share-data.mjs",
+    "configure:dependencies": "bun run scripts/configure-dependencies.mjs",
+    "capacitor:sync:before": "bun run generate:version-share",
+    "capacitor:update:before": "bun run generate:version-share",
+    "capacitor:sync:after": "bun run configure:dependencies"
+  }
+}
+```
+
+Guideline:
+- Use `*:before` for generated inputs needed by native sync/update.
+- Use `*:after` for native patching that depends on files created by sync/update.
+- Keep hook scripts idempotent.
+
 ## Public Launch (Required)
 
 ### 1) Publish in Capgo GitHub org as public

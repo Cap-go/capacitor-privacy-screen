@@ -96,6 +96,37 @@ bun run lint
 4. **Format** - `bun run fmt` auto-fixes ESLint, Prettier, and SwiftLint issues
 5. **Lint** - `bun run lint` checks code quality without modifying files
 
+## Capacitor Hook Scripts
+
+Use Capacitor lifecycle hooks in `package.json` when plugin setup must run automatically during `cap sync` / `cap update`.
+
+Recommended hooks:
+
+- `capacitor:sync:before` for code generation that must exist before native project sync.
+- `capacitor:update:before` for code generation that must exist before native project update.
+- `capacitor:sync:after` for post-sync native patching/configuration.
+- `capacitor:update:after` for post-update native patching/configuration.
+
+Example:
+
+```json
+{
+  "scripts": {
+    "generate:version-share": "bun run scripts/generate-version-share-data.mjs",
+    "configure:dependencies": "bun run scripts/configure-dependencies.mjs",
+    "capacitor:sync:before": "bun run generate:version-share",
+    "capacitor:update:before": "bun run generate:version-share",
+    "capacitor:sync:after": "bun run configure:dependencies"
+  }
+}
+```
+
+Notes:
+
+- Prefer `*:before` for deterministic inputs needed by native build/sync.
+- Use `*:after` only when the task depends on generated native files.
+- Keep hook scripts idempotent so repeated `cap sync` runs are safe.
+
 ### Individual Platform Verification
 
 ```bash
