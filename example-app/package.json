@@ -1,7 +1,7 @@
 {
-  "name": "privacy-screen-example",
+  "name": "plugin-template-example",
   "version": "1.0.0",
-  "description": "Example Capacitor app for @capgo/capacitor-privacy-screen",
+  "description": "Example Capacitor app for @capgo/capacitor-plugin-template",
   "type": "module",
   "scripts": {
     "start": "vite",
@@ -12,7 +12,7 @@
     "@capacitor/core": "^8.0.0",
     "@capacitor/android": "^8.0.0",
     "@capacitor/ios": "^8.0.0",
-    "@capgo/capacitor-privacy-screen": "file:.."
+    "@capgo/capacitor-plugin-template": "file:.."
   },
   "devDependencies": {
     "@capacitor/cli": "^8.0.0",

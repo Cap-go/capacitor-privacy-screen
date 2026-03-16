@@ -3,37 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@capgo/capacitor-privacy-screen Example</title>
+    <title>@capgo/capacitor-plugin-template Example</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <main class="shell">
-      <section class="hero">
-        <p class="eyebrow">Capgo plugin example</p>
-        <h1>Privacy screen control panel</h1>
-        <p class="lead">
-          Native builds enable protection automatically. Use the buttons below to inspect or temporarily relax the
-          shield while testing sensitive flows.
-        </p>
-      </section>
+    <main class="container">
+      <h1>@capgo/capacitor-plugin-template</h1>
+      <p class="lead">Quickly validate the template plugin wiring.</p>
 
-      <section class="panel">
-        <div class="status-row">
-          <div>
-            <p class="label">Current state</p>
-            <strong id="status-badge" class="badge">Loading</strong>
-          </div>
-          <button id="refresh-status" class="ghost">Refresh</button>
-        </div>
+      <label for="echo-value">Echo value</label>
+      <input id="echo-value" type="text" value="Hello from example app" />
 
-        <div class="actions">
-          <button id="enable-protection">Enable protection</button>
-          <button id="disable-protection" class="danger">Disable protection</button>
-          <button id="get-version" class="ghost">Get plugin version</button>
-        </div>
+      <div class="actions">
+        <button id="run-echo">Run echo</button>
+        <button id="get-version">Get plugin version</button>
+      </div>
 
-        <pre id="plugin-output">Loading plugin state...</pre>
-      </section>
+      <pre id="plugin-output">Press a button to run an action.</pre>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>

@@ -1,4 +1,24 @@
 /**
+ * Input payload for the echo call.
+ */
+export interface EchoOptions {
+  /**
+   * Arbitrary text that should be returned by native/web implementations.
+   */
+  value: string;
+}
+
+/**
+ * Echo response payload.
+ */
+export interface EchoResult {
+  /**
+   * The same value passed to `echo`.
+   */
+  value: string;
+}
+
+/**
  * Plugin version payload.
  */
 export interface PluginVersionResult {
@@ -9,41 +29,16 @@ export interface PluginVersionResult {
 }
 
 /**
- * Current privacy screen state.
+ * Base API used by the template plugin.
  */
-export interface PrivacyScreenStatus {
+export interface PluginTemplatePlugin {
   /**
-   * Whether privacy protection is currently enabled.
+   * Echo a string to validate JS <-> native wiring.
    */
-  enabled: boolean;
-}
-
-/**
- * Capacitor API for protecting app content from the app switcher preview.
- */
-export interface PrivacyScreenPlugin {
-  /**
-   * Enables the privacy screen.
-   *
-   * On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
-   * On iOS this restores the app-switcher overlay that hides your app while it is backgrounded.
-   */
-  enable(): Promise<PrivacyScreenStatus>;
+  echo(options: EchoOptions): Promise<EchoResult>;
 
   /**
-   * Disables the privacy screen.
-   *
-   * Use this only when you explicitly want the current screen to remain visible in system previews.
-   */
-  disable(): Promise<PrivacyScreenStatus>;
-
-  /**
-   * Returns the current enabled state.
-   */
-  isEnabled(): Promise<PrivacyScreenStatus>;
-
-  /**
-   * Returns the native implementation version marker.
+   * Returns the platform implementation version marker.
    */
   getPluginVersion(): Promise<PluginVersionResult>;
 }

@@ -1,7 +1,7 @@
 {
-  "name": "@capgo/capacitor-privacy-screen",
+  "name": "@capgo/capacitor-plugin-template",
   "version": "8.0.0",
-  "description": "Protect app content in Android screenshots and obscure the iOS app switcher snapshot.",
+  "description": "Capgo Capacitor plugin template for quickly bootstrapping new plugins.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -13,36 +13,37 @@
     "ios/Sources",
     "ios/Tests",
     "Package.swift",
-    "CapgoCapacitorPrivacyScreen.podspec"
+    "CapgoCapacitorPluginTemplate.podspec"
   ],
   "author": "Martin Donadieu <martin@capgo.app>",
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Cap-go/capacitor-privacy-screen.git"
+    "url": "git+https://github.com/Cap-go/capacitor-plugin-template.git"
   },
   "bugs": {
-    "url": "https://github.com/Cap-go/capacitor-privacy-screen/issues"
+    "url": "https://github.com/Cap-go/capacitor-plugin-template/issues"
   },
-  "homepage": "https://capgo.app/docs/plugins/privacy-screen/",
+  "homepage": "https://github.com/Cap-go/capacitor-plugin-template",
   "keywords": [
-    "capacitor",
-    "plugin",
-    "privacy",
-    "screen",
-    "security"
+    "__AI_KEYWORD_PRIMARY__",
+    "__AI_KEYWORD_SECONDARY__",
+    "__AI_KEYWORD_USE_CASE__",
+    "__AI_KEYWORD_PLATFORM__",
+    "__AI_KEYWORD_VENDOR__"
   ],
   "scripts": {
+    "init-plugin": "./scripts/init-plugin.sh",
     "verify": "bun run verify:ios && bun run verify:android && bun run verify:web",
-    "verify:ios": "xcodebuild -scheme CapgoCapacitorPrivacyScreen -destination generic/platform=iOS",
-    "verify:android": "bash ./scripts/run-android-gradle.sh",
+    "verify:ios": "xcodebuild -scheme CapgoCapacitorPluginTemplate -destination generic/platform=iOS",
+    "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "verify:web": "bun run build",
     "lint": "bun run eslint && bun run prettier -- --check && bun run swiftlint -- lint",
     "fmt": "bun run eslint -- --fix && bun run prettier -- --write && bun run swiftlint -- --fix --format",
     "eslint": "eslint . --ext .ts",
     "prettier": "prettier-pretty-check \"**/*.{css,html,ts,js,java}\" --plugin=prettier-plugin-java",
     "swiftlint": "node-swiftlint",
-    "docgen": "docgen --api PrivacyScreenPlugin --output-readme README.md --output-json dist/docs.json",
+    "docgen": "docgen --api PluginTemplatePlugin --output-readme README.md --output-json dist/docs.json",
     "build": "bun run clean && bun run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",

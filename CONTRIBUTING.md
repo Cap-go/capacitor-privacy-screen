@@ -1,6 +1,6 @@
 # Contributing
 
-This guide provides instructions for contributing to the Capgo privacy screen plugin.
+This guide provides instructions for contributing to this Capacitor plugin template.
 
 ## Developing
 
