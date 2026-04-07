@@ -10,6 +10,7 @@ import UIKit
     // With `isSecureTextEntry = true`, iOS marks this layer subtree as capture-protected.
     // We temporarily re-parent the window layer under that subtree to blank screenshots.
     private var screenshotPreventionTextField: UITextField?
+    private weak var screenshotProtectedWindow: UIWindow?
 
     deinit {
         stop()
@@ -87,14 +88,18 @@ import UIKit
 
         secureSublayer.addSublayer(window.layer)
         screenshotPreventionTextField = textField
+        screenshotProtectedWindow = window
     }
 
     private func disableScreenshotPrevention() {
         guard let textField = screenshotPreventionTextField else { return }
-        defer { screenshotPreventionTextField = nil }
+        defer {
+            screenshotPreventionTextField = nil
+            screenshotProtectedWindow = nil
+        }
 
         if let screenLayer = textField.layer.superlayer,
-           let window = currentWindow() {
+           let window = screenshotProtectedWindow {
             screenLayer.addSublayer(window.layer)
         }
         textField.layer.removeFromSuperlayer()
