@@ -6,6 +6,11 @@ import UIKit
     private var windowProvider: (() -> UIWindow?)?
     private weak var overlayView: UIView?
     private(set) var isEnabled = false
+    // Hidden secure text field used as a protected rendering host.
+    // With `isSecureTextEntry = true`, iOS marks this layer subtree as capture-protected.
+    // We temporarily re-parent the window layer under that subtree to blank screenshots.
+    private var screenshotPreventionTextField: UITextField?
+    private weak var screenshotProtectedWindow: UIWindow?
 
     deinit {
         stop()
@@ -46,13 +51,58 @@ import UIKit
         observers.removeAll()
         windowProvider = nil
         hideOverlay()
+        disableScreenshotPrevention()
     }
 
     @objc public func setEnabled(_ enabled: Bool) {
         isEnabled = enabled
-        if !enabled {
+        if enabled {
+            enableScreenshotPrevention()
+        } else {
             hideOverlay()
+            disableScreenshotPrevention()
         }
+    }
+
+    private func enableScreenshotPrevention() {
+        guard screenshotPreventionTextField == nil,
+              let window = currentWindow(),
+              let screenLayer = window.layer.superlayer else { return }
+
+        let textField = UITextField()
+        textField.isSecureTextEntry = true
+
+        screenLayer.addSublayer(textField.layer)
+
+        let secureSublayer: CALayer?
+        if #available(iOS 17.0, *) {
+            secureSublayer = textField.layer.sublayers?.last ?? textField.layer.sublayers?.first
+        } else {
+            secureSublayer = textField.layer.sublayers?.first ?? textField.layer.sublayers?.last
+        }
+
+        guard let secureSublayer else {
+            textField.layer.removeFromSuperlayer()
+            return
+        }
+
+        secureSublayer.addSublayer(window.layer)
+        screenshotPreventionTextField = textField
+        screenshotProtectedWindow = window
+    }
+
+    private func disableScreenshotPrevention() {
+        guard let textField = screenshotPreventionTextField else { return }
+        defer {
+            screenshotPreventionTextField = nil
+            screenshotProtectedWindow = nil
+        }
+
+        if let screenLayer = textField.layer.superlayer,
+           let window = screenshotProtectedWindow {
+            screenLayer.addSublayer(window.layer)
+        }
+        textField.layer.removeFromSuperlayer()
     }
 
     private func showOverlayIfNeeded() {
