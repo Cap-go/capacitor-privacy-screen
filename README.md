@@ -31,6 +31,34 @@ npm install @capgo/capacitor-privacy-screen
 npx cap sync
 ```
 
+## Configuration
+
+Protection is disabled by default. Enable it on native startup with Capacitor config:
+
+```ts
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.example.app',
+  appName: 'Example',
+  webDir: 'dist',
+  plugins: {
+    PrivacyScreen: {
+      enabled: true,
+      android: {
+        dimBackground: true,
+        privacyModeOnActivityHidden: 'splash',
+      },
+      ios: {
+        blurEffect: 'dark',
+      },
+    },
+  },
+};
+
+export default config;
+```
+
 ## Usage
 
 ```ts
@@ -51,15 +79,19 @@ const { enabled } = await PrivacyScreen.isEnabled();
 await PrivacyScreen.disable();
 
 await PrivacyScreen.enable();
+
+// Perform a flow where screenshots or previews should be protected.
+
+await PrivacyScreen.disable();
 ```
 
-The plugin enables protection automatically when the native plugin loads, so most apps do not need to call anything on startup.
+Use JavaScript calls when protection should only apply to specific screens or flows.
 
 ## Behavior
 
 - Android uses `WindowManager.LayoutParams.FLAG_SECURE`, which hides app content from screenshots, screen recording, and the recent apps preview.
 - Android can show a temporary dim or splash overlay for recent-apps and activity-hidden states.
-- iOS adds a temporary overlay while the app resigns active so the app switcher snapshot does not expose your content, with optional light or dark blur.
+- iOS hides app content from screenshots and adds a temporary overlay while the app resigns active so the app switcher snapshot does not expose your content, with optional light or dark blur.
 - Web keeps an in-memory enabled flag for API parity, but browsers cannot enforce native privacy-screen behavior.
 
 ## API
@@ -77,7 +109,7 @@ The plugin enables protection automatically when the native plugin loads, so mos
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-Capacitor API for protecting app content from the app switcher preview.
+Capacitor API for protecting app content from screenshots and app-switcher previews.
 
 ### enable(...)
 
@@ -88,7 +120,7 @@ enable(config?: PrivacyScreenConfig | undefined) => Promise<PrivacyScreenActionR
 Enables privacy screen protection.
 
 On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
-On iOS this restores the app-switcher overlay that hides your app while it is backgrounded.
+On iOS this hides app content from screenshots and restores the app-switcher overlay while backgrounded.
 
 | Param        | Type                                                                | Description                          |
 | ------------ | ------------------------------------------------------------------- | ------------------------------------ |
@@ -154,12 +186,13 @@ Result returned when privacy protection is toggled.
 
 #### PrivacyScreenConfig
 
-Platform-specific privacy screen behavior.
+Native startup and runtime configuration for privacy protection.
 
-| Prop          | Type                                                                                                                               | Description            |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| **`android`** | <code>{ dimBackground?: boolean; preventScreenshots?: boolean; privacyModeOnActivityHidden?: 'none' \| 'dim' \| 'splash'; }</code> | Android-only behavior. |
-| **`ios`**     | <code>{ blurEffect?: 'none' \| 'light' \| 'dark'; }</code>                                                                         | iOS-only behavior.     |
+| Prop          | Type                                                                                                                               | Description                                                                                                           | Default            |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| **`enabled`** | <code>boolean</code>                                                                                                               | Enable privacy protection automatically when the native plugin loads. This option is read from Capacitor config only. | <code>false</code> |
+| **`android`** | <code>{ dimBackground?: boolean; preventScreenshots?: boolean; privacyModeOnActivityHidden?: 'none' \| 'dim' \| 'splash'; }</code> | Android-only behavior.                                                                                                |                    |
+| **`ios`**     | <code>{ blurEffect?: 'none' \| 'light' \| 'dark'; }</code>                                                                         | iOS-only behavior.                                                                                                    |                    |
 
 
 #### PrivacyScreenStatus

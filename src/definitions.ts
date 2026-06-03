@@ -29,9 +29,18 @@ export interface PrivacyScreenActionResult extends PrivacyScreenStatus {
 }
 
 /**
- * Platform-specific privacy screen behavior.
+ * Native startup and runtime configuration for privacy protection.
  */
 export interface PrivacyScreenConfig {
+  /**
+   * Enable privacy protection automatically when the native plugin loads.
+   *
+   * This option is read from Capacitor config only.
+   *
+   * @default false
+   */
+  enabled?: boolean;
+
   /**
    * Android-only behavior.
    */
@@ -86,14 +95,14 @@ export interface PrivacyScreenConfig {
 }
 
 /**
- * Capacitor API for protecting app content from the app switcher preview.
+ * Capacitor API for protecting app content from screenshots and app-switcher previews.
  */
 export interface PrivacyScreenPlugin {
   /**
    * Enables privacy screen protection.
    *
    * On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
-   * On iOS this restores the app-switcher overlay that hides your app while it is backgrounded.
+   * On iOS this hides app content from screenshots and restores the app-switcher overlay while backgrounded.
    *
    * @param config Optional platform-specific behavior.
    */

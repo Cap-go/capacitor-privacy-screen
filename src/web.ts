@@ -8,7 +8,7 @@ import type {
 } from './definitions';
 
 export class PrivacyScreenWeb extends WebPlugin implements PrivacyScreenPlugin {
-  private enabled = true;
+  private enabled = false;
 
   async enable(): Promise<PrivacyScreenActionResult> {
     this.enabled = true;

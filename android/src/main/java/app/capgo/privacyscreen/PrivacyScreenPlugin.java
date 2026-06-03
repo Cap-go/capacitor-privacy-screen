@@ -11,6 +11,7 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import org.json.JSONObject;
 
 @CapacitorPlugin(name = "PrivacyScreen")
 public class PrivacyScreenPlugin extends Plugin {
@@ -50,18 +51,16 @@ public class PrivacyScreenPlugin extends Plugin {
             getContext().registerReceiver(recentAppsReceiver, new IntentFilter(ACTION_CLOSE_SYSTEM_DIALOGS));
         }
         receiverRegistered = true;
-        implementation.enable();
+        if (getConfig().getBoolean("enabled", false)) {
+            final JSONObject androidConfig = getConfig().getObject("android");
+            implementation.enable(getDimBackground(androidConfig), getPrivacyModeOnActivityHidden(androidConfig));
+        }
     }
 
     @PluginMethod
     public void enable(final PluginCall call) {
-        final JSObject androidConfig = call.getObject("android");
-        final boolean dimBackground = androidConfig != null && androidConfig.optBoolean("dimBackground", false);
-        final PrivacyScreen.PrivacyMode privacyModeOnActivityHidden = parsePrivacyMode(
-            androidConfig != null ? androidConfig.optString("privacyModeOnActivityHidden", "none") : "none"
-        );
-
-        implementation.enable(dimBackground, privacyModeOnActivityHidden);
+        final JSONObject androidConfig = call.getObject("android");
+        implementation.enable(getDimBackground(androidConfig), getPrivacyModeOnActivityHidden(androidConfig));
         call.resolve(actionResult(true));
     }
 
@@ -137,5 +136,13 @@ public class PrivacyScreenPlugin extends Plugin {
             return PrivacyScreen.PrivacyMode.SPLASH;
         }
         return PrivacyScreen.PrivacyMode.NONE;
+    }
+
+    private boolean getDimBackground(final JSONObject androidConfig) {
+        return androidConfig != null && androidConfig.optBoolean("dimBackground", false);
+    }
+
+    private PrivacyScreen.PrivacyMode getPrivacyModeOnActivityHidden(final JSONObject androidConfig) {
+        return parsePrivacyMode(androidConfig != null ? androidConfig.optString("privacyModeOnActivityHidden", "none") : "none");
     }
 }

@@ -2,6 +2,15 @@ import XCTest
 @testable import PrivacyScreenPlugin
 
 class PrivacyScreenPluginTests: XCTestCase {
+    func testStartDoesNotEnableByDefault() {
+        let implementation = PrivacyScreen()
+        implementation.start {
+            nil
+        }
+
+        XCTAssertFalse(implementation.isEnabled)
+    }
+
     func testEnableDisableState() {
         let implementation = PrivacyScreen()
         implementation.setEnabled(true)

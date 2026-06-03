@@ -19,6 +19,10 @@ public class PrivacyScreenPlugin: CAPPlugin, CAPBridgedPlugin {
             self.implementation.start { [weak self] in
                 self?.bridge?.viewController?.view.window
             }
+            if let iosConfig = self.getConfig().getObject("ios") {
+                self.implementation.setBlurEffect(iosConfig["blurEffect"] as? String)
+            }
+            self.implementation.setEnabled(self.getConfig().getBoolean("enabled", false))
         }
     }
 
