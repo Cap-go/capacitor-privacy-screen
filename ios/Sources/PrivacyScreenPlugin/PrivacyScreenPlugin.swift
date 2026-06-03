@@ -19,15 +19,22 @@ public class PrivacyScreenPlugin: CAPPlugin, CAPBridgedPlugin {
             self.implementation.start { [weak self] in
                 self?.bridge?.viewController?.view.window
             }
+            if let iosConfig = self.getConfig().getObject("ios") {
+                self.implementation.setBlurEffect(iosConfig["blurEffect"] as? String)
+            }
             self.implementation.setEnabled(self.getConfig().getBoolean("enabled", false))
         }
     }
 
     @objc func enable(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
+            if let iosConfig = call.getObject("ios") {
+                self.implementation.setBlurEffect(iosConfig["blurEffect"] as? String)
+            }
             self.implementation.setEnabled(true)
             call.resolve([
-                "enabled": self.implementation.isEnabled
+                "enabled": self.implementation.isEnabled,
+                "success": true
             ])
         }
     }
@@ -36,7 +43,8 @@ public class PrivacyScreenPlugin: CAPPlugin, CAPBridgedPlugin {
         DispatchQueue.main.async {
             self.implementation.setEnabled(false)
             call.resolve([
-                "enabled": self.implementation.isEnabled
+                "enabled": self.implementation.isEnabled,
+                "success": true
             ])
         }
     }
