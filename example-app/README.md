@@ -5,16 +5,16 @@ This Vite project links directly to the local plugin source so you can validate 
 ## Getting started
 
 ```bash
-bun install
-bun run start
+npm install
+npm run start
 ```
 
 To test on native shells:
 
 ```bash
-bunx cap add ios
-bunx cap add android
-bunx cap sync
+npx cap add ios
+npx cap add android
+npx cap sync
 ```
 
-Native shells enable the privacy screen automatically on load. Use the example buttons to disable it temporarily, then re-enable it and confirm the app switcher preview is hidden again.
+Native shells leave the privacy screen disabled unless you enable it in Capacitor config or with JavaScript. Use the example buttons to enable it, then confirm screenshots and app switcher previews are hidden.

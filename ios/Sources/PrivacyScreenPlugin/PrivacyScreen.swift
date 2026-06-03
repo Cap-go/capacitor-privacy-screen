@@ -20,7 +20,9 @@ import UIKit
         self.windowProvider = windowProvider
 
         guard observers.isEmpty else {
-            setEnabled(true)
+            if isEnabled {
+                enableScreenshotPrevention()
+            }
             return
         }
 
@@ -42,7 +44,9 @@ import UIKit
             }
         ]
 
-        setEnabled(true)
+        if isEnabled {
+            enableScreenshotPrevention()
+        }
     }
 
     @objc public func stop() {

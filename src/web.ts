@@ -3,7 +3,7 @@ import { WebPlugin } from '@capacitor/core';
 import type { PluginVersionResult, PrivacyScreenPlugin, PrivacyScreenStatus } from './definitions';
 
 export class PrivacyScreenWeb extends WebPlugin implements PrivacyScreenPlugin {
-  private enabled = true;
+  private enabled = false;
 
   async enable(): Promise<PrivacyScreenStatus> {
     this.enabled = true;
