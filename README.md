@@ -27,8 +27,29 @@ The most complete doc is available here: https://capgo.app/docs/plugins/privacy-
 ## Install
 
 ```bash
-bun add @capgo/capacitor-privacy-screen
-bunx cap sync
+npm install @capgo/capacitor-privacy-screen
+npx cap sync
+```
+
+## Configuration
+
+Protection is disabled by default. Enable it on native startup with Capacitor config:
+
+```ts
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.example.app',
+  appName: 'Example',
+  webDir: 'dist',
+  plugins: {
+    PrivacyScreen: {
+      enabled: true,
+    },
+  },
+};
+
+export default config;
 ```
 
 ## Usage
@@ -36,19 +57,19 @@ bunx cap sync
 ```ts
 import { PrivacyScreen } from '@capgo/capacitor-privacy-screen';
 
-await PrivacyScreen.disable();
-
-// Perform a flow where screenshots or previews are acceptable.
-
 await PrivacyScreen.enable();
+
+// Perform a flow where screenshots or previews should be protected.
+
+await PrivacyScreen.disable();
 ```
 
-The plugin enables protection automatically when the native plugin loads, so most apps do not need to call anything on startup.
+Use JavaScript calls when protection should only apply to specific screens or flows.
 
 ## Behavior
 
 - Android uses `WindowManager.LayoutParams.FLAG_SECURE`, which hides app content from screenshots, screen recording, and the recent apps preview.
-- iOS adds a temporary overlay while the app resigns active so the app switcher snapshot does not expose your content.
+- iOS hides app content from screenshots and adds a temporary overlay while the app resigns active so the app switcher snapshot does not expose your content.
 - Web keeps an in-memory enabled flag for API parity, but browsers cannot enforce native privacy-screen behavior.
 
 ## API
@@ -66,7 +87,7 @@ The plugin enables protection automatically when the native plugin loads, so mos
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-Capacitor API for protecting app content from the app switcher preview.
+Capacitor API for protecting app content from screenshots and app-switcher previews.
 
 ### enable()
 
@@ -77,7 +98,7 @@ enable() => Promise<PrivacyScreenStatus>
 Enables the privacy screen.
 
 On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
-On iOS this restores the app-switcher overlay that hides your app while it is backgrounded.
+On iOS this hides app content from screenshots and restores the app-switcher overlay while backgrounded.
 
 **Returns:** <code>Promise&lt;<a href="#privacyscreenstatus">PrivacyScreenStatus</a>&gt;</code>
 

@@ -14,7 +14,9 @@ public class PrivacyScreenPlugin extends Plugin {
     @Override
     public void load() {
         implementation = new PrivacyScreen(getActivity());
-        implementation.enable();
+        if (getConfig().getBoolean("enabled", false)) {
+            implementation.enable();
+        }
     }
 
     @PluginMethod
