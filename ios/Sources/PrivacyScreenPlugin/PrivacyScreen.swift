@@ -6,6 +6,7 @@ import UIKit
     private var windowProvider: (() -> UIWindow?)?
     private weak var overlayView: UIView?
     private(set) var isEnabled = false
+    private var blurEffectStyle: UIBlurEffect.Style?
     // Hidden secure text field used as a protected rendering host.
     // With `isSecureTextEntry = true`, iOS marks this layer subtree as capture-protected.
     // We temporarily re-parent the window layer under that subtree to blank screenshots.
@@ -43,6 +44,22 @@ import UIKit
         ]
 
         setEnabled(true)
+    }
+
+    @objc public func setBlurEffect(_ blurEffect: String?) {
+        switch blurEffect {
+        case "light":
+            blurEffectStyle = .light
+        case "dark":
+            blurEffectStyle = .dark
+        default:
+            blurEffectStyle = nil
+        }
+
+        if overlayView != nil {
+            hideOverlay()
+            showOverlayIfNeeded()
+        }
     }
 
     @objc public func stop() {
@@ -133,27 +150,20 @@ import UIKit
     }
 
     private func makeOverlayView(frame: CGRect) -> UIView {
+        if let blurEffectStyle = blurEffectStyle {
+            let blurView = UIVisualEffectView(effect: UIBlurEffect(style: blurEffectStyle))
+            blurView.frame = frame
+            return blurView
+        }
+
         if let storyboardView = UIStoryboard(name: "LaunchScreen", bundle: nil).instantiateInitialViewController()?.view {
             storyboardView.frame = frame
             storyboardView.backgroundColor = .systemBackground
             return storyboardView
         }
 
-        let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
-        blurView.frame = frame
-
-        let shield = UILabel(frame: .zero)
-        shield.translatesAutoresizingMaskIntoConstraints = false
-        shield.text = "Protected"
-        shield.font = UIFont.systemFont(ofSize: 24, weight: .semibold)
-        shield.textColor = .secondaryLabel
-
-        blurView.contentView.addSubview(shield)
-        NSLayoutConstraint.activate([
-            shield.centerXAnchor.constraint(equalTo: blurView.contentView.centerXAnchor),
-            shield.centerYAnchor.constraint(equalTo: blurView.contentView.centerYAnchor)
-        ])
-
-        return blurView
+        let fallbackView = UIView(frame: frame)
+        fallbackView.backgroundColor = .systemBackground
+        return fallbackView
     }
 }

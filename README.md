@@ -27,8 +27,8 @@ The most complete doc is available here: https://capgo.app/docs/plugins/privacy-
 ## Install
 
 ```bash
-bun add @capgo/capacitor-privacy-screen
-bunx cap sync
+npm install @capgo/capacitor-privacy-screen
+npx cap sync
 ```
 
 ## Usage
@@ -36,9 +36,19 @@ bunx cap sync
 ```ts
 import { PrivacyScreen } from '@capgo/capacitor-privacy-screen';
 
-await PrivacyScreen.disable();
+await PrivacyScreen.enable({
+  android: {
+    dimBackground: true,
+    privacyModeOnActivityHidden: 'splash',
+  },
+  ios: {
+    blurEffect: 'dark',
+  },
+});
 
-// Perform a flow where screenshots or previews are acceptable.
+const { enabled } = await PrivacyScreen.isEnabled();
+
+await PrivacyScreen.disable();
 
 await PrivacyScreen.enable();
 ```
@@ -48,14 +58,15 @@ The plugin enables protection automatically when the native plugin loads, so mos
 ## Behavior
 
 - Android uses `WindowManager.LayoutParams.FLAG_SECURE`, which hides app content from screenshots, screen recording, and the recent apps preview.
-- iOS adds a temporary overlay while the app resigns active so the app switcher snapshot does not expose your content.
+- Android can show a temporary dim or splash overlay for recent-apps and activity-hidden states.
+- iOS adds a temporary overlay while the app resigns active so the app switcher snapshot does not expose your content, with optional light or dark blur.
 - Web keeps an in-memory enabled flag for API parity, but browsers cannot enforce native privacy-screen behavior.
 
 ## API
 
 <docgen-index>
 
-* [`enable()`](#enable)
+* [`enable(...)`](#enable)
 * [`disable()`](#disable)
 * [`isEnabled()`](#isenabled)
 * [`getPluginVersion()`](#getpluginversion)
@@ -68,18 +79,22 @@ The plugin enables protection automatically when the native plugin loads, so mos
 
 Capacitor API for protecting app content from the app switcher preview.
 
-### enable()
+### enable(...)
 
 ```typescript
-enable() => Promise<PrivacyScreenStatus>
+enable(config?: PrivacyScreenConfig | undefined) => Promise<PrivacyScreenActionResult>
 ```
 
-Enables the privacy screen.
+Enables privacy screen protection.
 
 On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
 On iOS this restores the app-switcher overlay that hides your app while it is backgrounded.
 
-**Returns:** <code>Promise&lt;<a href="#privacyscreenstatus">PrivacyScreenStatus</a>&gt;</code>
+| Param        | Type                                                                | Description                          |
+| ------------ | ------------------------------------------------------------------- | ------------------------------------ |
+| **`config`** | <code><a href="#privacyscreenconfig">PrivacyScreenConfig</a></code> | Optional platform-specific behavior. |
+
+**Returns:** <code>Promise&lt;<a href="#privacyscreenactionresult">PrivacyScreenActionResult</a>&gt;</code>
 
 --------------------
 
@@ -87,14 +102,14 @@ On iOS this restores the app-switcher overlay that hides your app while it is ba
 ### disable()
 
 ```typescript
-disable() => Promise<PrivacyScreenStatus>
+disable() => Promise<PrivacyScreenActionResult>
 ```
 
-Disables the privacy screen.
+Disables privacy screen protection.
 
 Use this only when you explicitly want the current screen to remain visible in system previews.
 
-**Returns:** <code>Promise&lt;<a href="#privacyscreenstatus">PrivacyScreenStatus</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#privacyscreenactionresult">PrivacyScreenActionResult</a>&gt;</code>
 
 --------------------
 
@@ -126,6 +141,25 @@ Returns the native implementation version marker.
 
 
 ### Interfaces
+
+
+#### PrivacyScreenActionResult
+
+Result returned when privacy protection is toggled.
+
+| Prop          | Type                 | Description                             |
+| ------------- | -------------------- | --------------------------------------- |
+| **`success`** | <code>boolean</code> | Whether the native operation completed. |
+
+
+#### PrivacyScreenConfig
+
+Platform-specific privacy screen behavior.
+
+| Prop          | Type                                                                                                                               | Description            |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| **`android`** | <code>{ dimBackground?: boolean; preventScreenshots?: boolean; privacyModeOnActivityHidden?: 'none' \| 'dim' \| 'splash'; }</code> | Android-only behavior. |
+| **`ios`**     | <code>{ blurEffect?: 'none' \| 'light' \| 'dark'; }</code>                                                                         | iOS-only behavior.     |
 
 
 #### PrivacyScreenStatus

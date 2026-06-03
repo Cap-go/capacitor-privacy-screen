@@ -19,23 +19,92 @@ export interface PrivacyScreenStatus {
 }
 
 /**
+ * Result returned when privacy protection is toggled.
+ */
+export interface PrivacyScreenActionResult extends PrivacyScreenStatus {
+  /**
+   * Whether the native operation completed.
+   */
+  success: boolean;
+}
+
+/**
+ * Platform-specific privacy screen behavior.
+ */
+export interface PrivacyScreenConfig {
+  /**
+   * Android-only behavior.
+   */
+  android?: {
+    /**
+     * Controls how the app appears when the app switcher privacy screen is displayed.
+     *
+     * When `true`, Android shows a dim overlay. When `false`, Android shows the
+     * splash drawable when available and falls back to dimming.
+     *
+     * @default false
+     */
+    dimBackground?: boolean;
+
+    /**
+     * Deprecated upstream compatibility option.
+     *
+     * `FLAG_SECURE` is always applied while the privacy screen is enabled. To allow
+     * screenshots for a screen or flow, call `disable()` before it and `enable()` after it.
+     *
+     * @deprecated This option is ignored and will be removed in a future major version.
+     */
+    preventScreenshots?: boolean;
+
+    /**
+     * Controls how Android appears when the activity is hidden, such as while a
+     * system biometric prompt is displayed.
+     *
+     * - `none`: no temporary overlay
+     * - `dim`: dim overlay
+     * - `splash`: splash drawable when available, otherwise dim overlay
+     *
+     * @default 'none'
+     */
+    privacyModeOnActivityHidden?: 'none' | 'dim' | 'splash';
+  };
+
+  /**
+   * iOS-only behavior.
+   */
+  ios?: {
+    /**
+     * Controls how iOS obscures the app switcher snapshot.
+     *
+     * `light` and `dark` use native blur effects. `none` uses the launch screen
+     * when available and otherwise falls back to a system background.
+     *
+     * @default 'none'
+     */
+    blurEffect?: 'none' | 'light' | 'dark';
+  };
+}
+
+/**
  * Capacitor API for protecting app content from the app switcher preview.
  */
 export interface PrivacyScreenPlugin {
   /**
-   * Enables the privacy screen.
+   * Enables privacy screen protection.
    *
    * On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
    * On iOS this restores the app-switcher overlay that hides your app while it is backgrounded.
+   *
+   * @param config Optional platform-specific behavior.
    */
-  enable(): Promise<PrivacyScreenStatus>;
+  enable(config?: PrivacyScreenConfig): Promise<PrivacyScreenActionResult>;
 
   /**
-   * Disables the privacy screen.
+   * Disables privacy screen protection.
    *
    * Use this only when you explicitly want the current screen to remain visible in system previews.
    */
-  disable(): Promise<PrivacyScreenStatus>;
+  disable(): Promise<PrivacyScreenActionResult>;
 
   /**
    * Returns the current enabled state.

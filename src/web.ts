@@ -1,18 +1,23 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { PluginVersionResult, PrivacyScreenPlugin, PrivacyScreenStatus } from './definitions';
+import type {
+  PluginVersionResult,
+  PrivacyScreenActionResult,
+  PrivacyScreenPlugin,
+  PrivacyScreenStatus,
+} from './definitions';
 
 export class PrivacyScreenWeb extends WebPlugin implements PrivacyScreenPlugin {
   private enabled = true;
 
-  async enable(): Promise<PrivacyScreenStatus> {
+  async enable(): Promise<PrivacyScreenActionResult> {
     this.enabled = true;
-    return { enabled: this.enabled };
+    return { enabled: this.enabled, success: true };
   }
 
-  async disable(): Promise<PrivacyScreenStatus> {
+  async disable(): Promise<PrivacyScreenActionResult> {
     this.enabled = false;
-    return { enabled: this.enabled };
+    return { enabled: this.enabled, success: true };
   }
 
   async isEnabled(): Promise<PrivacyScreenStatus> {
