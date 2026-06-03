@@ -45,12 +45,14 @@ public class PrivacyScreenPlugin extends Plugin {
     @Override
     public void load() {
         implementation = new PrivacyScreen(getActivity());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getContext().registerReceiver(recentAppsReceiver, new IntentFilter(ACTION_CLOSE_SYSTEM_DIALOGS), Context.RECEIVER_NOT_EXPORTED);
-        } else {
+
+        // ACTION_CLOSE_SYSTEM_DIALOGS is restricted to system apps on Android 12+.
+        // FLAG_SECURE remains active; this receiver only improves legacy recent-apps overlay timing.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             getContext().registerReceiver(recentAppsReceiver, new IntentFilter(ACTION_CLOSE_SYSTEM_DIALOGS));
+            receiverRegistered = true;
         }
-        receiverRegistered = true;
+
         if (getConfig().getBoolean("enabled", false)) {
             final JSONObject androidConfig = getConfig().getObject("android");
             implementation.enable(getDimBackground(androidConfig), getPrivacyModeOnActivityHidden(androidConfig));

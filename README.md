@@ -91,7 +91,7 @@ Use JavaScript calls when protection should only apply to specific screens or fl
 
 - Android uses `WindowManager.LayoutParams.FLAG_SECURE`, which hides app content from screenshots, screen recording, and the recent apps preview.
 - Android can show a temporary dim or splash overlay for recent-apps and activity-hidden states.
-- iOS hides app content from screenshots and adds a temporary overlay while the app resigns active so the app switcher snapshot does not expose your content, with optional light or dark blur.
+- iOS adds a temporary overlay while the app resigns active so the app-switcher snapshot does not expose your content, with optional light or dark blur. iOS cannot prevent user-initiated screenshots or screen recording.
 - Web keeps an in-memory enabled flag for API parity, but browsers cannot enforce native privacy-screen behavior.
 
 ## API
@@ -120,7 +120,9 @@ enable(config?: PrivacyScreenConfig | undefined) => Promise<PrivacyScreenActionR
 Enables privacy screen protection.
 
 On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
-On iOS this hides app content from screenshots and restores the app-switcher overlay while backgrounded.
+On iOS this adds an overlay while the app is backgrounded so app content
+does not appear in the app-switcher snapshot. iOS cannot prevent
+user-initiated screenshots or screen recording.
 
 | Param        | Type                                                                | Description                          |
 | ------------ | ------------------------------------------------------------------- | ------------------------------------ |

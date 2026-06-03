@@ -16,8 +16,8 @@ public class PrivacyScreen {
 
     private final Activity activity;
     private boolean enabled;
-    private boolean dimBackground;
-    private PrivacyMode privacyModeOnActivityHidden = PrivacyMode.NONE;
+    private volatile boolean dimBackground;
+    private volatile PrivacyMode privacyModeOnActivityHidden = PrivacyMode.NONE;
     private PrivacyScreenDialog dialog;
 
     public PrivacyScreen(final Activity activity) {

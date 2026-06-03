@@ -102,7 +102,9 @@ export interface PrivacyScreenPlugin {
    * Enables privacy screen protection.
    *
    * On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
-   * On iOS this hides app content from screenshots and restores the app-switcher overlay while backgrounded.
+   * On iOS this adds an overlay while the app is backgrounded so app content
+   * does not appear in the app-switcher snapshot. iOS cannot prevent
+   * user-initiated screenshots or screen recording.
    *
    * @param config Optional platform-specific behavior.
    */

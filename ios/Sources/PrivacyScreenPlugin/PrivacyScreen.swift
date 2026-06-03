@@ -56,6 +56,8 @@ import UIKit
             blurEffectStyle = .light
         case "dark":
             blurEffectStyle = .dark
+        case "none":
+            blurEffectStyle = nil
         default:
             blurEffectStyle = nil
         }

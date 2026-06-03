@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 public class PrivacyScreenDialog extends Dialog {
 
     private static final int DIM_OVERLAY_COLOR = Color.argb(230, 0, 0, 0);
+    private boolean lostFocusOnce;
 
     public PrivacyScreenDialog(final Activity activity, final boolean dimBackground) {
         super(activity, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
@@ -42,8 +43,16 @@ public class PrivacyScreenDialog extends Dialog {
     @Override
     public void onWindowFocusChanged(final boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        hide();
-        new Handler(Looper.getMainLooper()).post(this::dismiss);
+        if (!hasFocus) {
+            lostFocusOnce = true;
+            return;
+        }
+
+        if (lostFocusOnce) {
+            lostFocusOnce = false;
+            hide();
+            new Handler(Looper.getMainLooper()).post(this::dismiss);
+        }
     }
 
     private boolean setSplashContent(final Activity activity) {
