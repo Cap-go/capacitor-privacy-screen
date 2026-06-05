@@ -4,12 +4,12 @@ import UIKit
 @objc public class PrivacyScreen: NSObject {
     private var observers: [NSObjectProtocol] = []
     private var windowProvider: (() -> UIWindow?)?
+    private var applicationStateProvider: () -> UIApplication.State = { UIApplication.shared.applicationState }
     private weak var overlayView: UIView?
     private(set) var isEnabled = false
     private var blurEffectStyle: UIBlurEffect.Style?
-    // Hidden secure text field used as a protected rendering host.
+    // Hidden secure text field used as a protected rendering host while enabled.
     // With `isSecureTextEntry = true`, iOS marks this layer subtree as capture-protected.
-    // We temporarily re-parent the window layer under that subtree to blank screenshots.
     private var screenshotPreventionTextField: UITextField?
     private weak var screenshotProtectedWindow: UIWindow?
 
@@ -81,10 +81,19 @@ import UIKit
         isEnabled = enabled
         if enabled {
             enableScreenshotPrevention()
+            showOverlayIfAppIsInactive()
         } else {
             hideOverlay()
             disableScreenshotPrevention()
         }
+    }
+
+    func setApplicationStateProvider(_ provider: @escaping () -> UIApplication.State) {
+        applicationStateProvider = provider
+    }
+
+    var isScreenshotPreventionActive: Bool {
+        screenshotPreventionTextField != nil
     }
 
     private func enableScreenshotPrevention() {
@@ -142,6 +151,14 @@ import UIKit
     private func hideOverlay() {
         overlayView?.removeFromSuperview()
         overlayView = nil
+    }
+
+    private func showOverlayIfAppIsInactive() {
+        guard applicationStateProvider() != .active else {
+            return
+        }
+
+        showOverlayIfNeeded()
     }
 
     private func currentWindow() -> UIWindow? {
