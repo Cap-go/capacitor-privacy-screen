@@ -109,7 +109,7 @@ Use JavaScript calls when protection should only apply to specific screens or fl
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-Capacitor API for protecting app content from screenshots and app-switcher previews.
+Capacitor API for protecting app content from Android screenshots and native app-switcher previews.
 
 ### enable(...)
 

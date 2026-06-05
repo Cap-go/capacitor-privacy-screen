@@ -19,4 +19,17 @@ class PrivacyScreenPluginTests: XCTestCase {
         implementation.setEnabled(false)
         XCTAssertFalse(implementation.isEnabled)
     }
+
+    func testEnableDoesNotRequestWindowForLiveCapture() {
+        let implementation = PrivacyScreen()
+        var requestedWindow = false
+        implementation.start {
+            requestedWindow = true
+            return nil
+        }
+
+        implementation.setEnabled(true)
+
+        XCTAssertFalse(requestedWindow)
+    }
 }

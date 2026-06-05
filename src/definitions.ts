@@ -95,7 +95,7 @@ export interface PrivacyScreenConfig {
 }
 
 /**
- * Capacitor API for protecting app content from screenshots and app-switcher previews.
+ * Capacitor API for protecting app content from Android screenshots and native app-switcher previews.
  */
 export interface PrivacyScreenPlugin {
   /**
