@@ -1,4 +1,5 @@
 import XCTest
+import UIKit
 @testable import PrivacyScreenPlugin
 
 class PrivacyScreenPluginTests: XCTestCase {
@@ -23,6 +24,9 @@ class PrivacyScreenPluginTests: XCTestCase {
     func testEnableDoesNotRequestWindowForLiveCapture() {
         let implementation = PrivacyScreen()
         var requestedWindow = false
+        implementation.setApplicationStateProvider {
+            .active
+        }
         implementation.start {
             requestedWindow = true
             return nil
@@ -31,5 +35,21 @@ class PrivacyScreenPluginTests: XCTestCase {
         implementation.setEnabled(true)
 
         XCTAssertFalse(requestedWindow)
+    }
+
+    func testEnableWhileInactiveRequestsWindowForOverlay() {
+        let implementation = PrivacyScreen()
+        var requestedWindow = false
+        implementation.setApplicationStateProvider {
+            .inactive
+        }
+        implementation.start {
+            requestedWindow = true
+            return nil
+        }
+
+        implementation.setEnabled(true)
+
+        XCTAssertTrue(requestedWindow)
     }
 }
