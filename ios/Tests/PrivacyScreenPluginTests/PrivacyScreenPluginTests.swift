@@ -5,11 +5,15 @@ import UIKit
 class PrivacyScreenPluginTests: XCTestCase {
     func testStartDoesNotEnableByDefault() {
         let implementation = PrivacyScreen()
+        var requestedWindow = false
         implementation.start {
-            nil
+            requestedWindow = true
+            return nil
         }
 
         XCTAssertFalse(implementation.isEnabled)
+        XCTAssertFalse(implementation.isScreenshotPreventionActive)
+        XCTAssertFalse(requestedWindow)
     }
 
     func testEnableDisableState() {
@@ -21,7 +25,7 @@ class PrivacyScreenPluginTests: XCTestCase {
         XCTAssertFalse(implementation.isEnabled)
     }
 
-    func testEnableDoesNotRequestWindowForLiveCapture() {
+    func testEnableRequestsWindowForCaptureProtection() {
         let implementation = PrivacyScreen()
         var requestedWindow = false
         implementation.setApplicationStateProvider {
@@ -34,6 +38,20 @@ class PrivacyScreenPluginTests: XCTestCase {
 
         implementation.setEnabled(true)
 
+        XCTAssertTrue(requestedWindow)
+    }
+
+    func testDisableDoesNotRequestWindowWhenNotEnabled() {
+        let implementation = PrivacyScreen()
+        var requestedWindow = false
+        implementation.start {
+            requestedWindow = true
+            return nil
+        }
+
+        implementation.setEnabled(false)
+
+        XCTAssertFalse(implementation.isScreenshotPreventionActive)
         XCTAssertFalse(requestedWindow)
     }
 

@@ -95,16 +95,16 @@ export interface PrivacyScreenConfig {
 }
 
 /**
- * Capacitor API for protecting app content from Android screenshots and native app-switcher previews.
+ * Capacitor API for protecting app content from screenshots, screen recording, and native app-switcher previews.
  */
 export interface PrivacyScreenPlugin {
   /**
    * Enables privacy screen protection.
    *
    * On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
-   * On iOS this adds an overlay while the app is backgrounded so app content
-   * does not appear in the app-switcher snapshot. iOS cannot prevent
-   * user-initiated screenshots or screen recording.
+   * On iOS this places app content in a secure rendering subtree while enabled
+   * and adds an overlay while the app is backgrounded so app content does not
+   * appear in the app-switcher snapshot.
    *
    * @param config Optional platform-specific behavior.
    */

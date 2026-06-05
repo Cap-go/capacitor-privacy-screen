@@ -91,7 +91,7 @@ Use JavaScript calls when protection should only apply to specific screens or fl
 
 - Android uses `WindowManager.LayoutParams.FLAG_SECURE`, which hides app content from screenshots, screen recording, and the recent apps preview.
 - Android can show a temporary dim or splash overlay for recent-apps and activity-hidden states.
-- iOS adds a temporary overlay while the app resigns active so the app-switcher snapshot does not expose your content, with optional light or dark blur. iOS cannot prevent user-initiated screenshots or screen recording.
+- iOS places app content in a secure rendering subtree while enabled and adds a temporary overlay while the app resigns active so the app-switcher snapshot does not expose your content, with optional light or dark blur.
 - Web keeps an in-memory enabled flag for API parity, but browsers cannot enforce native privacy-screen behavior.
 
 ## API
@@ -109,7 +109,7 @@ Use JavaScript calls when protection should only apply to specific screens or fl
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-Capacitor API for protecting app content from Android screenshots and native app-switcher previews.
+Capacitor API for protecting app content from screenshots, screen recording, and native app-switcher previews.
 
 ### enable(...)
 
@@ -120,9 +120,9 @@ enable(config?: PrivacyScreenConfig | undefined) => Promise<PrivacyScreenActionR
 Enables privacy screen protection.
 
 On Android this sets `FLAG_SECURE`, which also blocks screenshots and screen recording.
-On iOS this adds an overlay while the app is backgrounded so app content
-does not appear in the app-switcher snapshot. iOS cannot prevent
-user-initiated screenshots or screen recording.
+On iOS this places app content in a secure rendering subtree while enabled
+and adds an overlay while the app is backgrounded so app content does not
+appear in the app-switcher snapshot.
 
 | Param        | Type                                                                | Description                          |
 | ------------ | ------------------------------------------------------------------- | ------------------------------------ |

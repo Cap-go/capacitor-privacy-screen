@@ -8,6 +8,10 @@ import UIKit
     private weak var overlayView: UIView?
     private(set) var isEnabled = false
     private var blurEffectStyle: UIBlurEffect.Style?
+    // Hidden secure text field used as a protected rendering host while enabled.
+    // With `isSecureTextEntry = true`, iOS marks this layer subtree as capture-protected.
+    private var screenshotPreventionTextField: UITextField?
+    private weak var screenshotProtectedWindow: UIWindow?
 
     deinit {
         stop()
@@ -17,6 +21,9 @@ import UIKit
         self.windowProvider = windowProvider
 
         guard observers.isEmpty else {
+            if isEnabled {
+                enableScreenshotPrevention()
+            }
             return
         }
 
@@ -37,6 +44,10 @@ import UIKit
                 self?.hideOverlay()
             }
         ]
+
+        if isEnabled {
+            enableScreenshotPrevention()
+        }
     }
 
     @objc public func setBlurEffect(_ blurEffect: String?) {
@@ -63,19 +74,67 @@ import UIKit
         observers.removeAll()
         windowProvider = nil
         hideOverlay()
+        disableScreenshotPrevention()
     }
 
     @objc public func setEnabled(_ enabled: Bool) {
         isEnabled = enabled
         if enabled {
+            enableScreenshotPrevention()
             showOverlayIfAppIsInactive()
         } else {
             hideOverlay()
+            disableScreenshotPrevention()
         }
     }
 
     func setApplicationStateProvider(_ provider: @escaping () -> UIApplication.State) {
         applicationStateProvider = provider
+    }
+
+    var isScreenshotPreventionActive: Bool {
+        screenshotPreventionTextField != nil
+    }
+
+    private func enableScreenshotPrevention() {
+        guard screenshotPreventionTextField == nil,
+              let window = currentWindow(),
+              let screenLayer = window.layer.superlayer else { return }
+
+        let textField = UITextField()
+        textField.isSecureTextEntry = true
+
+        screenLayer.addSublayer(textField.layer)
+
+        let secureSublayer: CALayer?
+        if #available(iOS 17.0, *) {
+            secureSublayer = textField.layer.sublayers?.last ?? textField.layer.sublayers?.first
+        } else {
+            secureSublayer = textField.layer.sublayers?.first ?? textField.layer.sublayers?.last
+        }
+
+        guard let secureSublayer else {
+            textField.layer.removeFromSuperlayer()
+            return
+        }
+
+        secureSublayer.addSublayer(window.layer)
+        screenshotPreventionTextField = textField
+        screenshotProtectedWindow = window
+    }
+
+    private func disableScreenshotPrevention() {
+        guard let textField = screenshotPreventionTextField else { return }
+        defer {
+            screenshotPreventionTextField = nil
+            screenshotProtectedWindow = nil
+        }
+
+        if let screenLayer = textField.layer.superlayer,
+           let window = screenshotProtectedWindow {
+            screenLayer.addSublayer(window.layer)
+        }
+        textField.layer.removeFromSuperlayer()
     }
 
     private func showOverlayIfNeeded() {
