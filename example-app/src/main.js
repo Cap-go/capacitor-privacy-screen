@@ -1,3 +1,5 @@
+import { CapacitorUpdater } from '@capgo/capacitor-updater';
+import { Capacitor } from '@capacitor/core';
 import './style.css';
 import { PrivacyScreen } from '@capgo/capacitor-privacy-screen';
 
@@ -59,3 +61,9 @@ versionButton.addEventListener('click', async () => {
 });
 
 refreshStatus();
+
+if (Capacitor.isNativePlatform()) {
+  CapacitorUpdater.notifyAppReady().catch((error) => {
+    console.error('Capgo notifyAppReady failed', error);
+  });
+}
