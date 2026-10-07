@@ -1,10 +1,27 @@
 # @capgo/capacitor-privacy-screen
-<a href="https://capgo.app/"><img src="https://capgo.app/readme-banner.svg?repo=Cap-go/capacitor-privacy-screen" alt="Capgo - Instant updates for Capacitor" /></a>
+
+Keep sensitive screens private in your Capacitor app: block screenshots and screen recording on Android and hide your content in the iOS app switcher. Built for banking, health and messaging apps.
+
+<a href="https://capgo.app/?ref=plugin_privacy_screen"><img src="https://capgo.app/readme-banner.svg?repo=Cap-go/capacitor-privacy-screen" alt="Capgo - Instant updates for Capacitor" /></a>
 
 <div align="center">
-  <h2><a href="https://capgo.app/?ref=plugin_privacy_screen"> ➡️ Get Instant updates for your App with Capgo</a></h2>
-  <h2><a href="https://capgo.app/consulting/?ref=plugin_privacy_screen"> Missing a feature? We’ll build the plugin for you 💪</a></h2>
+  <p><b>Capgo</b>: open-source live updates for Ionic and Capacitor apps. Ship OTA fixes and features instantly, without waiting for app store review.</p>
+  <h2><a href="https://capgo.app/register/?ref=plugin_privacy_screen">➡️ Get started for free</a></h2>
+  <p>14-day unlimited free trial. No credit card required</p>
+  <p><a href="https://capgo.app/consulting/?ref=plugin_privacy_screen">Missing a feature? We'll build the plugin for you 💪</a></p>
 </div>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Cap-go/capacitor-privacy-screen/main/assets/github-social-preview.png" alt="@capgo/capacitor-privacy-screen for Capacitor apps" width="300" />
+</p>
+
+## Key features
+
+- **Enable and disable**: `enable()` and `disable()` turn protection on and off at runtime.
+- **Android**: sets `FLAG_SECURE`, which blocks screenshots and screen recording, with a configurable overlay in recent apps.
+- **iOS**: hides app content from the app switcher snapshot with a light or dark blur, or your launch screen.
+- **State**: `isEnabled()` reports the current state.
+- **Platforms**: iOS and Android. A Capacitor port of PrivacyScreenPlugin. Web only tracks the enabled state.
 
 Protect sensitive app content from appearing in Android screenshots and iOS app-switcher previews.
 
