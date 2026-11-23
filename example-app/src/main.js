@@ -9,14 +9,25 @@ const enableButton = document.getElementById('enable-protection');
 const disableButton = document.getElementById('disable-protection');
 const refreshButton = document.getElementById('refresh-status');
 const versionButton = document.getElementById('get-version');
+const hideContentOnFocusLossToggle = document.getElementById('hide-content-on-focus-loss');
+let protectionEnabled = false;
 
 const setOutput = (value) => {
   output.textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
 };
 
 const setStatus = (enabled) => {
+  protectionEnabled = enabled;
   statusBadge.textContent = enabled ? 'Enabled' : 'Disabled';
   statusBadge.dataset.enabled = String(enabled);
+};
+
+const enableProtection = async () => {
+  const result = await PrivacyScreen.enable({
+    android: { hideContentOnFocusLoss: hideContentOnFocusLossToggle.checked },
+  });
+  setStatus(result.enabled);
+  setOutput(result);
 };
 
 const refreshStatus = async () => {
@@ -31,9 +42,7 @@ const refreshStatus = async () => {
 
 enableButton.addEventListener('click', async () => {
   try {
-    const result = await PrivacyScreen.enable();
-    setStatus(result.enabled);
-    setOutput(result);
+    await enableProtection();
   } catch (error) {
     setOutput(`Error: ${error?.message ?? error}`);
   }
@@ -50,6 +59,18 @@ disableButton.addEventListener('click', async () => {
 });
 
 refreshButton.addEventListener('click', refreshStatus);
+
+hideContentOnFocusLossToggle.addEventListener('change', async () => {
+  if (!protectionEnabled) {
+    return;
+  }
+
+  try {
+    await enableProtection();
+  } catch (error) {
+    setOutput(`Error: ${error?.message ?? error}`);
+  }
+});
 
 versionButton.addEventListener('click', async () => {
   try {
