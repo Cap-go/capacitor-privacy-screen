@@ -87,6 +87,8 @@ export interface PrivacyScreenConfig {
      * Focus is also lost when dialogs (e.g. HTML `<select>`, `alert()`), permission prompts
      * or the notification shade are displayed: the content is hidden behind them too.
      * The overlay is skipped in multi-window mode.
+     * While this overlay is visible, it takes precedence over `privacyModeOnActivityHidden`:
+     * the configured DIM/SPLASH dialog is skipped while the overlay already hides the window.
      *
      * @default false
      */

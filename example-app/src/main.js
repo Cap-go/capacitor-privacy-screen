@@ -11,6 +11,8 @@ const refreshButton = document.getElementById('refresh-status');
 const versionButton = document.getElementById('get-version');
 const hideContentOnFocusLossToggle = document.getElementById('hide-content-on-focus-loss');
 let protectionEnabled = false;
+const HIDE_CONTENT_ON_FOCUS_LOSS_KEY = 'hideContentOnFocusLoss';
+hideContentOnFocusLossToggle.checked = localStorage.getItem(HIDE_CONTENT_ON_FOCUS_LOSS_KEY) === 'true';
 
 const setOutput = (value) => {
   output.textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
@@ -61,6 +63,7 @@ disableButton.addEventListener('click', async () => {
 refreshButton.addEventListener('click', refreshStatus);
 
 hideContentOnFocusLossToggle.addEventListener('change', async () => {
+  localStorage.setItem(HIDE_CONTENT_ON_FOCUS_LOSS_KEY, String(hideContentOnFocusLossToggle.checked));
   if (!protectionEnabled) {
     return;
   }
