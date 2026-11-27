@@ -135,7 +135,7 @@ Use JavaScript calls when protection should only apply to specific screens or fl
 
 - Android uses `WindowManager.LayoutParams.FLAG_SECURE`, which hides app content from screenshots, screen recording, and supported recent-apps previews.
 - Android can show a temporary dim or splash overlay for recent-apps and activity-hidden states.
-- Android can optionally hide the content with an opaque overlay as soon as the window loses focus (`hideContentOnFocusLoss`), because some launchers (e.g. Pixel) show the live app window during the Recents gesture. Because dialogs and the notification shade also take focus, this is opt-in.
+- Android can optionally hide the content with an opaque overlay as soon as the window loses focus (`hideContentOnFocusLoss`), because some launchers (e.g. Pixel) show the live app window during the Recents gesture. Because dialogs and the notification shade also take focus, this is opt-in. While this overlay is visible, it takes precedence over `privacyModeOnActivityHidden`: the configured DIM/SPLASH dialog is skipped while the overlay already hides the window.
 - iOS places app content in a secure rendering subtree while enabled and adds a temporary overlay while the app resigns active so the app-switcher snapshot does not expose your content, with optional light or dark blur.
 - Web keeps an in-memory enabled flag for API parity, but browsers cannot enforce native privacy-screen behavior.
 
@@ -235,11 +235,11 @@ Result returned when privacy protection is toggled.
 
 Native startup and runtime configuration for privacy protection.
 
-| Prop          | Type                                                                                                                               | Description                                                                                                           | Default            |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| **`enabled`** | <code>boolean</code>                                                                                                               | Enable privacy protection automatically when the native plugin loads. This option is read from Capacitor config only. | <code>false</code> |
+| Prop          | Type                                                                                                                                                                 | Description                                                                                                           | Default            |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| **`enabled`** | <code>boolean</code>                                                                                                                                                 | Enable privacy protection automatically when the native plugin loads. This option is read from Capacitor config only. | <code>false</code> |
 | **`android`** | <code>{ dimBackground?: boolean; preventScreenshots?: boolean; privacyModeOnActivityHidden?: 'none' \| 'dim' \| 'splash'; hideContentOnFocusLoss?: boolean; }</code> | Android-only behavior.                                                                                                |                    |
-| **`ios`**     | <code>{ blurEffect?: 'none' \| 'light' \| 'dark'; }</code>                                                                         | iOS-only behavior.                                                                                                    |                    |
+| **`ios`**     | <code>{ blurEffect?: 'none' \| 'light' \| 'dark'; }</code>                                                                                                           | iOS-only behavior.                                                                                                    |                    |
 
 
 #### PrivacyScreenStatus

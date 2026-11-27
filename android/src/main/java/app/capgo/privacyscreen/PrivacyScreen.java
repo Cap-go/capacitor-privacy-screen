@@ -123,6 +123,7 @@ public class PrivacyScreen {
     public void handleConfigurationChanged() {
         if (focusOverlay != null) {
             focusOverlay.setBackground(createFocusOverlayBackground());
+            focusOverlay.setAlpha((activity.hasWindowFocus() || activity.isInMultiWindowMode()) ? 0f : 1f);
         }
     }
 
@@ -147,6 +148,8 @@ public class PrivacyScreen {
                 return;
             }
 
+            // The focus overlay already hides the live window, so skip the DIM/SPLASH dialog
+            // while it is visible. privacyModeOnActivityHidden stays in effect once the overlay is hidden.
             if (focusOverlay != null && focusOverlay.getAlpha() > 0f) {
                 return;
             }
@@ -181,7 +184,7 @@ public class PrivacyScreen {
         focusOverlay = new View(activity);
         focusOverlay.setBackground(createFocusOverlayBackground());
         // The overlay stays attached and only its alpha is toggled, so it is drawn in the very next frame on focus loss.
-        focusOverlay.setAlpha(0f);
+        focusOverlay.setAlpha((activity.hasWindowFocus() || activity.isInMultiWindowMode()) ? 0f : 1f);
         focusOverlay.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         activity.addContentView(
             focusOverlay,
