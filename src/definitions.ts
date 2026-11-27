@@ -76,6 +76,23 @@ export interface PrivacyScreenConfig {
      * @default 'none'
      */
     privacyModeOnActivityHidden?: 'none' | 'dim' | 'splash';
+
+    /**
+     * Hides the app content with an opaque overlay as soon as the activity window loses focus.
+     *
+     * Some launchers (e.g. Pixel) show the live app window while the Recents gesture is in progress,
+     * which `FLAG_SECURE` does not hide. The overlay uses the theme `android:windowBackground`
+     * with an opaque black fallback and is removed when focus returns.
+     *
+     * Focus is also lost when dialogs (e.g. HTML `<select>`, `alert()`), permission prompts
+     * or the notification shade are displayed: the content is hidden behind them too.
+     * The overlay is skipped in multi-window mode.
+     * While this overlay is visible, it takes precedence over `privacyModeOnActivityHidden`:
+     * the configured DIM/SPLASH dialog is skipped while the overlay already hides the window.
+     *
+     * @default false
+     */
+    hideContentOnFocusLoss?: boolean;
   };
 
   /**
