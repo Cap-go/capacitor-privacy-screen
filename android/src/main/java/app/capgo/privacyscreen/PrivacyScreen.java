@@ -178,6 +178,8 @@ public class PrivacyScreen {
         // The overlay stays attached and only its alpha is toggled, so it is drawn in the very next frame on focus loss.
         focusOverlay.setAlpha((activity.hasWindowFocus() || activity.isInMultiWindowMode()) ? 0f : 1f);
         focusOverlay.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        // The overlay is raised with Z only for draw order, so it must not cast a shadow.
+        focusOverlay.setOutlineProvider(null);
         attachFocusOverlayOnTop();
     }
 
@@ -202,13 +204,27 @@ public class PrivacyScreen {
                 focusOverlay,
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             );
+        }
+
+        final ViewParent attachedParent = focusOverlay.getParent();
+        if (!(attachedParent instanceof ViewGroup)) {
             return;
         }
 
-        final ViewGroup group = (ViewGroup) parent;
+        final ViewGroup group = (ViewGroup) attachedParent;
         if (group.getChildAt(group.getChildCount() - 1) != focusOverlay) {
             focusOverlay.bringToFront();
         }
+
+        // Child order only applies among equal Z, so an elevated sibling would still draw above the overlay.
+        float maxSiblingZ = 0f;
+        for (int i = 0; i < group.getChildCount(); i++) {
+            final View child = group.getChildAt(i);
+            if (child != focusOverlay) {
+                maxSiblingZ = Math.max(maxSiblingZ, child.getZ());
+            }
+        }
+        focusOverlay.setZ(maxSiblingZ + 1f);
     }
 
     private void removeFocusOverlay() {
