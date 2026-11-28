@@ -33,6 +33,7 @@ We build, improve and fix our plugins with heavy use of AI, so issues usually ge
 - **Enable and disable**: `enable()` and `disable()` turn protection on and off at runtime.
 - **Android**: sets `FLAG_SECURE`, which blocks screenshots and screen recording, with a configurable overlay in recent apps.
 - **iOS**: hides app content from the app switcher snapshot with a light or dark blur, or your launch screen.
+- **Pixel live Recents preview**: opt-in `hideContentOnFocusLoss` hides the app with an opaque overlay as soon as the window loses focus, so Pixel Launcher cannot show live content during the Recents gesture.
 - **State**: `isEnabled()` reports the current state.
 - **Platforms**: iOS and Android. A Capacitor port of PrivacyScreenPlugin. Web only tracks the enabled state.
 
@@ -131,11 +132,25 @@ await PrivacyScreen.disable();
 
 Use JavaScript calls when protection should only apply to specific screens or flows.
 
+### Hide the live Recents preview on Pixel (Android)
+
+`FLAG_SECURE` blocks screenshots and task snapshots, but Pixel Launcher still shows the live app window while the Recents gesture is in progress. Turn on `hideContentOnFocusLoss` to cover the app with an opaque overlay (your theme `windowBackground`, or black) the moment the window loses focus. It is removed as soon as focus returns.
+
+```ts
+await PrivacyScreen.enable({
+  android: {
+    hideContentOnFocusLoss: true,
+  },
+});
+```
+
+It is off by default because dialogs (HTML `<select>`, `alert()`), permission prompts and the notification shade also take focus, so the content is hidden behind them too. The overlay is skipped in multi-window mode.
+
 ## Behavior
 
 - Android uses `WindowManager.LayoutParams.FLAG_SECURE`, which hides app content from screenshots, screen recording, and supported recent-apps previews.
 - Android can show a temporary dim or splash overlay for recent-apps and activity-hidden states.
-- Android can optionally hide the content with an opaque overlay as soon as the window loses focus (`hideContentOnFocusLoss`), because some launchers (e.g. Pixel) show the live app window during the Recents gesture. Because dialogs and the notification shade also take focus, this is opt-in. While this overlay is visible, it takes precedence over `privacyModeOnActivityHidden`: the configured DIM/SPLASH dialog is skipped while the overlay already hides the window.
+- Android can optionally hide the content with an opaque overlay as soon as the window loses focus (`hideContentOnFocusLoss`), because some launchers (for example Pixel) show the live app window during the Recents gesture. Because dialogs and the notification shade also take focus, this is opt-in. While this overlay is visible, it takes precedence over `privacyModeOnActivityHidden`: the configured DIM/SPLASH dialog is skipped while the overlay already hides the window.
 - iOS places app content in a secure rendering subtree while enabled and adds a temporary overlay while the app resigns active so the app-switcher snapshot does not expose your content, with optional light or dark blur.
 - Web keeps an in-memory enabled flag for API parity, but browsers cannot enforce native privacy-screen behavior.
 

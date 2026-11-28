@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
-import android.os.Handler;
 import android.os.Looper;
 import android.util.TypedValue;
 import android.view.View;
@@ -17,8 +16,6 @@ import android.view.WindowManager;
 import androidx.appcompat.content.res.AppCompatResources;
 
 public class PrivacyScreen {
-
-    private static final long FOCUS_OVERLAY_HIDE_DELAY_MS = 50L;
 
     public enum PrivacyMode {
         NONE,
@@ -31,8 +28,6 @@ public class PrivacyScreen {
     private volatile boolean dimBackground;
     private volatile PrivacyMode privacyModeOnActivityHidden = PrivacyMode.NONE;
     private PrivacyScreenDialog dialog;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private final Runnable hideFocusOverlayRunnable = this::hideFocusOverlay;
     private View focusOverlay;
 
     public PrivacyScreen(final Activity activity) {
@@ -112,18 +107,15 @@ public class PrivacyScreen {
             return;
         }
 
-        mainHandler.removeCallbacks(hideFocusOverlayRunnable);
-        if (hasFocus) {
-            mainHandler.postDelayed(hideFocusOverlayRunnable, FOCUS_OVERLAY_HIDE_DELAY_MS);
-        } else {
-            focusOverlay.setAlpha(activity.isInMultiWindowMode() ? 0f : 1f);
-        }
+        // Hide right away when focus returns: the app is already in front, so a delayed hide
+        // would only keep the opaque overlay over live content for a visible moment.
+        updateFocusOverlay(!hasFocus && !activity.isInMultiWindowMode());
     }
 
     public void handleConfigurationChanged() {
         if (focusOverlay != null) {
             focusOverlay.setBackground(createFocusOverlayBackground());
-            focusOverlay.setAlpha((activity.hasWindowFocus() || activity.isInMultiWindowMode()) ? 0f : 1f);
+            updateFocusOverlay(!activity.hasWindowFocus() && !activity.isInMultiWindowMode());
         }
     }
 
@@ -186,20 +178,40 @@ public class PrivacyScreen {
         // The overlay stays attached and only its alpha is toggled, so it is drawn in the very next frame on focus loss.
         focusOverlay.setAlpha((activity.hasWindowFocus() || activity.isInMultiWindowMode()) ? 0f : 1f);
         focusOverlay.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        activity.addContentView(
-            focusOverlay,
-            new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        );
+        attachFocusOverlayOnTop();
     }
 
-    private void hideFocusOverlay() {
-        if (focusOverlay != null) {
-            focusOverlay.setAlpha(0f);
+    private void updateFocusOverlay(final boolean visible) {
+        if (focusOverlay == null) {
+            return;
+        }
+
+        if (visible) {
+            // Views added to the content after enable() would otherwise be drawn above the overlay.
+            attachFocusOverlayOnTop();
+        }
+        focusOverlay.setAlpha(visible ? 1f : 0f);
+    }
+
+    // Keeps the overlay as the last (topmost) child of its parent, and re-attaches it if the
+    // content was replaced (for example by a later setContentView()).
+    private void attachFocusOverlayOnTop() {
+        final ViewParent parent = focusOverlay.getParent();
+        if (!(parent instanceof ViewGroup)) {
+            activity.addContentView(
+                focusOverlay,
+                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            );
+            return;
+        }
+
+        final ViewGroup group = (ViewGroup) parent;
+        if (group.getChildAt(group.getChildCount() - 1) != focusOverlay) {
+            focusOverlay.bringToFront();
         }
     }
 
     private void removeFocusOverlay() {
-        mainHandler.removeCallbacks(hideFocusOverlayRunnable);
         if (focusOverlay == null) {
             return;
         }
