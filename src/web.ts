@@ -5,7 +5,7 @@ import type {
   PrivacyScreenActionResult,
   PrivacyScreenPlugin,
   PrivacyScreenStatus,
-} from './definitions';
+} from './definitions.js';
 
 export class PrivacyScreenWeb extends WebPlugin implements PrivacyScreenPlugin {
   private enabled = false;
