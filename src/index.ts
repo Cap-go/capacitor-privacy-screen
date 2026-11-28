@@ -1,10 +1,10 @@
 import { registerPlugin } from '@capacitor/core';
 
-import type { PrivacyScreenPlugin } from './definitions';
+import type { PrivacyScreenPlugin } from './definitions.js';
 
 const PrivacyScreen = registerPlugin<PrivacyScreenPlugin>('PrivacyScreen', {
-  web: () => import('./web').then((m) => new m.PrivacyScreenWeb()),
+  web: () => import('./web.js').then((m) => new m.PrivacyScreenWeb()),
 });
 
-export * from './definitions';
+export * from './definitions.js';
 export { PrivacyScreen };

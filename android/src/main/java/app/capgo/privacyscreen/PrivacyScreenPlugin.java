@@ -5,7 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Build;
+import android.view.ViewTreeObserver;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -23,6 +25,7 @@ public class PrivacyScreenPlugin extends Plugin {
 
     private PrivacyScreen implementation;
     private boolean receiverRegistered;
+    private ViewTreeObserver.OnWindowFocusChangeListener focusChangeListener;
 
     private final BroadcastReceiver recentAppsReceiver = new BroadcastReceiver() {
         @Override
@@ -45,6 +48,8 @@ public class PrivacyScreenPlugin extends Plugin {
     @Override
     public void load() {
         implementation = new PrivacyScreen(getActivity());
+        focusChangeListener = implementation::handleWindowFocusChanged;
+        getActivity().getWindow().getDecorView().getViewTreeObserver().addOnWindowFocusChangeListener(focusChangeListener);
 
         // ACTION_CLOSE_SYSTEM_DIALOGS is restricted to system apps on Android 12+.
         // FLAG_SECURE remains active; this receiver only improves legacy recent-apps overlay timing.
@@ -55,14 +60,22 @@ public class PrivacyScreenPlugin extends Plugin {
 
         if (getConfig().getBoolean("enabled", false)) {
             final JSONObject androidConfig = getConfig().getObject("android");
-            implementation.enable(getDimBackground(androidConfig), getPrivacyModeOnActivityHidden(androidConfig));
+            implementation.enable(
+                getDimBackground(androidConfig),
+                getPrivacyModeOnActivityHidden(androidConfig),
+                getHideContentOnFocusLoss(androidConfig)
+            );
         }
     }
 
     @PluginMethod
     public void enable(final PluginCall call) {
         final JSONObject androidConfig = call.getObject("android");
-        implementation.enable(getDimBackground(androidConfig), getPrivacyModeOnActivityHidden(androidConfig));
+        implementation.enable(
+            getDimBackground(androidConfig),
+            getPrivacyModeOnActivityHidden(androidConfig),
+            getHideContentOnFocusLoss(androidConfig)
+        );
         call.resolve(actionResult(true));
     }
 
@@ -101,6 +114,14 @@ public class PrivacyScreenPlugin extends Plugin {
     }
 
     @Override
+    protected void handleOnConfigurationChanged(final Configuration newConfig) {
+        super.handleOnConfigurationChanged(newConfig);
+        if (implementation != null) {
+            implementation.handleConfigurationChanged();
+        }
+    }
+
+    @Override
     protected void handleOnDestroy() {
         if (implementation != null) {
             implementation.destroy();
@@ -113,6 +134,15 @@ public class PrivacyScreenPlugin extends Plugin {
                 // Receiver was already unregistered by Android during teardown.
             }
             receiverRegistered = false;
+        }
+
+        if (focusChangeListener != null) {
+            // The observer used in load() is replaced once the decor view is attached, so fetch the current one.
+            final ViewTreeObserver observer = getActivity().getWindow().getDecorView().getViewTreeObserver();
+            if (observer.isAlive()) {
+                observer.removeOnWindowFocusChangeListener(focusChangeListener);
+            }
+            focusChangeListener = null;
         }
 
         super.handleOnDestroy();
@@ -146,5 +176,9 @@ public class PrivacyScreenPlugin extends Plugin {
 
     private PrivacyScreen.PrivacyMode getPrivacyModeOnActivityHidden(final JSONObject androidConfig) {
         return parsePrivacyMode(androidConfig != null ? androidConfig.optString("privacyModeOnActivityHidden", "none") : "none");
+    }
+
+    private boolean getHideContentOnFocusLoss(final JSONObject androidConfig) {
+        return androidConfig != null && androidConfig.optBoolean("hideContentOnFocusLoss", false);
     }
 }
